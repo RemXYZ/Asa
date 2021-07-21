@@ -173,8 +173,8 @@ const get_my_time = function (lg) {
 
 	let week_names = {
 		ru:["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
-		en:["Sunday","Suturday","Friday","Thursday","Wadnesday","Tuesday","Monday"],
-		ang:["Sunday","Suturday","Friday","Thursday","Wadnesday","Tuesday","Monday"]
+		en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+		ang:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
 	}
 
 	//yr = year, s_yr = short year, mo = month, wk = weak, d = day, h = hour, min = minute, s = secund
