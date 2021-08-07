@@ -223,9 +223,15 @@ const get_my_time = function (lg) {
 
 // Drag&Drop PART
 
-function internalColision (el,speedX,speedY,par) {
+function internalColision (el,par,e,speedX,speedY) {
 //SPEED must be a difference between first mouse coordinate and second coordinate
 //for exaple, we have fisrt x coordinate of the mouse (event.x) and after triggering by some function, we set another  x coordinate of the mouse, then we calculate difference between them. So the first x coodrinate f.e. was 200, then we run some function, where we get another x coordinate, f.e. 205, after that we calculate difference between these 2 number, and it will be 205 - 200 = 5, and 5 is the speed.
+
+const e = my_event === undefined || my_event == "" || my_event == false ? window.event : my_event;
+
+if (e != window.event) {
+	console.error('The third argument must be an event or false or undefined or ""');
+}
 
 let speed = {
 x:speedX,
@@ -266,22 +272,27 @@ let tldp = {
 
 //collision calculation
 
-if (tldp.x >= parCrd.w) {
+//Right collision
+if ((tldp.x >= parCrd.w)) {
 	outSpeed.X = speed.x - (tldp.x - parCrd.w);
 	elCrd.moveXL = false;
 	report.right = true;
+
 } 
+//Left collision
 if (elCrd.x + speed.x <= 0) {
 	outSpeed.X = speed.x - (elCrd.x + speed.x);
 	elCrd.moveXR = false;
 	report.left = true;
 } 
 
+//Bottom collision
 if (tldp.y >= parCrd.h) {
 	outSpeed.Y = speed.y - (tldp.y - parCrd.h);
 	elCrd.moveYB = false;
 	report.bottom = true;
 }
+//Top collision
 if (elCrd.y + speed.y < 0) {
 	outSpeed.Y = speed.y - (elCrd.y + speed.y);
 	elCrd.moveYT = false;
@@ -393,7 +404,7 @@ mouse.y = e.y - mouse.y;
 
 if (par) {
 //this if is for collision with parent
-let new_speed = internalColision (el,mouse.x,mouse.y,par);
+let new_speed = internalColision (el,par,e,mouse.x,mouse.y);
 
 //and this for change coords of element
 elCrd.x += new_speed.x;
@@ -718,8 +729,6 @@ let elCrd = getElCrd(el);
 	// console.log(speed,new_speed)
 
 	//COLITION FOR RESIZER, NOT FOR ELEMENT
-	// new_par_speedSize = internalColision (currentResizer,new_speed.w,new_speed.h,par);
-	// new_par_speedCrd = internalColision (currentResizer,new_speed.x,new_speed.y,par);
 	let inpSpeed = {
 		w:new_speed.w,
 		h:new_speed.h,
@@ -727,8 +736,8 @@ let elCrd = getElCrd(el);
 		y:new_speed.y
 	}
 if (par instanceof Element) {
-	new_par_speedSize = internalColision (currentResizer,new_speed.w,new_speed.h,par);
-	new_par_speedCrd = internalColision (currentResizer,new_speed.x,new_speed.y,par);
+	new_par_speedSize = internalColision (currentResizer,par,e,new_speed.w,new_speed.h);
+	new_par_speedCrd = internalColision (currentResizer,par,e,new_speed.x,new_speed.y);
 
 	if (new_par_speedCrd.report.top) {
 		new_par_speedSize.y = 0;
