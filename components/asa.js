@@ -1,9 +1,14 @@
-//!!!
-//The whole script was written by an individual Rem Karablin except for sources from internet that are highlighted as //sourse [url] ... //sourceEnd
-//!!!
+/*
+AsaJS v.0.4.0
 
-//SETTING
+(c) 2021 by RemXYZ. All rights reserved.
+This source code is licensed under the MIT license found in the
+LICENSE file in the root directory of this source tree.
 
+https://github.com/RemXYZ/Asa
+*/
+
+//SETTINGs
 const asa_setting = {
 	D_D:{stop_before_the_border:false}
 }
