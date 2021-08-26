@@ -12,6 +12,11 @@ https://github.com/RemXYZ/AsaJS
 const asa_setting = {
 	D_D:{stop_before_the_border:false}
 }
+
+function asaTest(hello) {
+	console.log("Hello");
+	console.log(hello)
+}
 	
 //GET ELEMENT 
 let getEl = function (mix) {
@@ -21,6 +26,7 @@ let getEl = function (mix) {
 		result = mix;
 	}else {
 		result = document.querySelectorAll(mix);
+		if (result.length == 0) {console.error(`Object ${mix} is not defined`); return undefined;}
 
 		for (let i = 0;result.length>i;i++) {
 			let resultF = result[i];
@@ -82,7 +88,6 @@ while(stop) {
 }
 // Object.prototype.find_top_node = find_top_node;
 
-//ADDED***
 //replace sign with index
 const replaceAt = function(txt, i, repl) {
 	if (this instanceof Element & typeof this == "object") {
@@ -105,6 +110,19 @@ const replaceAt = function(txt, i, repl) {
 	return String(txt).substr(0, i) + repl + String(txt).substr(i + repl.length);
 }
 
+//Added 26.08.21
+//Changing the default innerHTML method
+const html = function (txt) {
+	if (txt === undefined) {
+		return this.innerHTML;
+	}
+	this.innerHTML = txt;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////FREE PART/////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+
 function stopEvent (e) {
 	//*cross-browser stop
 	e.stopPropagation ? e.stopPropagation() : (e.cancelBubble=true);
@@ -122,10 +140,8 @@ function isEmptyObject(obj) {
 }
 //sourceEnd
 
-//**WAS
-	
 //CREATE(MAKE) A ELEMENT
-function mkEl (tag,att) {
+function crEl (tag,att) {
 	//att mast be a object
 	//expample {"class":"input","type":"number"}
 	let node = document.createElement(tag);
@@ -136,10 +152,10 @@ function mkEl (tag,att) {
 			}
 		}
 	}
+	node = getEl(node);
 	return node;
 }
 
-//ADDED***
 //sourse https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandom(min, max) {
 	return Math.random() * (max - min) + min;
@@ -152,6 +168,8 @@ function getRandomInt(min, max, round) {
 	return result.toFixed(round);
 	}
 //sourceEnd
+
+///////////////////////////////////TIME PART///////////////////////////////////////////
 
 //if less then 10
 function if_lt_10 (unit) {
@@ -211,10 +229,8 @@ const get_my_time = function (lg) {
 
 	return date;
 }
-//WAS***
 
-
-
+///////////////////////////////////END TIME PART///////////////////////////////////////////
 
 	
 //DRAG AND DROP PART
