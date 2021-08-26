@@ -20,28 +20,34 @@ function asaTest(hello) {
 	
 //GET ELEMENT 
 let getEl = function (mix) {
+	
 
-	let result;
+	let result = false;
 	if (mix instanceof Element & typeof mix == "object") {
-		result = mix;
+		result = [mix];
 	}else {
 		result = document.querySelectorAll(mix);
 		if (result.length == 0) {console.error(`Object ${mix} is not defined`); return undefined;}
+	}
+	if (result != false) {
 
 		for (let i = 0;result.length>i;i++) {
+				
 			let resultF = result[i];
 			resultF.__proto__.CSSinfo = CSSinfo;
 			resultF.__proto__.setCSS = setCSS;
 			resultF.__proto__.find_top_node = find_top_node;
 			resultF.__proto__.replaceAt = replaceAt;
 			resultF.__proto__.getElCrd = getElCrd;
+			resultF.__proto__.html = html;
 		}
 
 		if (result.length == 1) {
 			result = result[0];
 		}
-		
+
 	}
+
 	return result;
 }
 
