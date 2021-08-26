@@ -902,8 +902,6 @@ const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 			
 		let new_speed = set_dctn(speed);
 	
-		// console.log(speed,new_speed)
-	
 		//COLITION FOR RESIZER, NOT FOR ELEMENT
 		let inpSpeed = {
 			w:new_speed.w,
@@ -1018,3 +1016,5 @@ const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 	}
 	
 	//sourseEnd
+
+	export {getEl, stopEvent, isEmptyObject, mkEl, getRandom, getRandomInt, get_my_time, getElCrd, D_D, resizeEl, getCoords}
