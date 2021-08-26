@@ -1,5 +1,5 @@
 /*
-AsaJS v.0.4.0
+AsaJS v.0.4.1
 
 (c) 2021 by RemXYZ. All rights reserved.
 This source code is licensed under the MIT license found in the
@@ -23,7 +23,7 @@ let getEl = function (mix) {
 		result = document.querySelectorAll(mix);
 
 		for (let i = 0;result.length>i;i++) {
-			resultF = result[i];
+			let resultF = result[i];
 			resultF.__proto__.CSSinfo = CSSinfo;
 			resultF.__proto__.setCSS = setCSS;
 			resultF.__proto__.find_top_node = find_top_node;
@@ -251,131 +251,179 @@ const getElCrd = function (el,par) {
 	
 	// Drag&Drop PART
 	
-	function internalColision (el,par,my_event,speedX,speedY) {
+	let LastMouseBorder = [];
+
+	function internalColision (el,par,my_event,speedX,speedY,both) {
 	//SPEED must be a difference between first mouse coordinate and second coordinate
 	//for exaple, we have fisrt x coordinate of the mouse (event.x) and after triggering by some function, we set another  x coordinate of the mouse, then we calculate difference between them. So the first x coodrinate f.e. was 200, then we run some function, where we get another x coordinate, f.e. 205, after that we calculate difference between these 2 number, and it will be 205 - 200 = 5, and 5 is the speed.
-	
+
+
 	const e = my_event === undefined || my_event == "" || my_event == false ? window.event : my_event;
 	if (e != window.event) {
 		console.error('The third argument must be an event or false or undefined or ""');
 	}
-	
-	let speed = {
-	x:speedX,
-	y:speedY
+
+	const speed = {
+		x:speedX,
+		y:speedY
 	}
-	
-	let outSpeed = {
-		X:0,
-		Y:0
-	}
-	let report = {
+	let sOut = speed;
+	sOut.colision = {
 		top:false,
 		right:false,
 		bottom:false,
 		left:false
-	};
-	
-	let parCrd = getElCrd(par);
-	
-	let elCrd = {
-		X:getCoords(el).left,
-		Y:getCoords(el).top,
-		x:getCoords(el).left - parCrd.X - (par.offsetWidth - par.clientWidth)/2,
-		y:getCoords(el).top - parCrd.Y - (par.offsetWidth - par.clientWidth)/2,
-		w:el.offsetWidth,
-		h:el.offsetHeight,
-		moveXL: true,
-		moveXR: true,
-		moveYB: true,
-		moveYT: true
+	}
+	sOut.mouseOut = {
+		top:false,
+		right:false,
+		bottom:false,
+		left:false
 	}
 	
+	const parCrd = getElCrd(par);
+	const elCrd = getElCrd(el,par);
+	elCrd.x = elCrd.x_abs;
+	elCrd.y = elCrd.y_abs;
+
 	// total displacement
 	let tldp = {
 		x: elCrd.x + elCrd.w + speed.x,
 		y: elCrd.y + elCrd.h + speed.y
 	}
-	
+
 	//collision calculation
-	
+	let i;
+	let isLastMeeting = LastMouseBorder.filter((item,ix)=>{i = ix; return item.el == el});
+	let LastMeeting = {
+		x:isLastMeeting[0] !== undefined ? isLastMeeting[0].x : 0,
+		y:isLastMeeting[0] !== undefined ? isLastMeeting[0].y : 0,
+		dir:isLastMeeting[0] !== undefined ? isLastMeeting[0].dir : 0,
+		i:isLastMeeting[0] !== undefined ? i : 0
+	};
+
+	function sСalculation (untEl,untPar,dir) {
+
+		if (!LastMouseBorder.some(i=>{
+			if (i[untEl] == 0) {
+				i[untEl] = e[untEl];
+			}
+			if (i.dir[untEl] === undefined) {
+				i.dir[untEl] = dir;
+			}
+			return i.el == el;})
+		) {
+			let MouseBorderData = {el};
+			MouseBorderData.dir = {};
+			MouseBorderData.dir[untEl] = dir;
+			MouseBorderData.x = 0;
+			MouseBorderData.y = 0;
+			MouseBorderData[untEl] = e[untEl];
+			LastMouseBorder.push(MouseBorderData)
+		}
+
+		return dir == "+" ? 
+			speed[untEl] - (tldp[untEl] - parCrd[untPar]):
+			speed[untEl] - (elCrd[untEl] + speed[untEl]);
+	}
+
+	function trackLastMeeting (unit,ar_dir) {
+		// if (withBorder == false) {
+		// 	return 0;
+		// }
+		dir = ar_dir=="+" ? "-":"+";
+		let unit_ = unit == "x" ? "y": "x";
+		if (dir == "+") {
+			if (LastMeeting[unit] != 0 && LastMeeting.dir[unit] == dir) {
+				if (LastMeeting[unit] < e[unit]) {sOut[unit] = 0;}
+
+				if (unit == "x") sOut.mouseOut.right = true;
+				if (unit == "y") sOut.mouseOut.bottom = true;
+
+				if (LastMeeting[unit] >= e[unit]) {
+					LastMeeting[unit] = 0;
+					if (LastMeeting[unit_] == 0) {
+						if (LastMeeting[unit_] == 0) LastMouseBorder.splice(LastMeeting.i,1);
+					}
+				}
+			}
+		}
+		if (dir == "-") {
+			if (LastMeeting[unit] != 0 && LastMeeting.dir[unit] == dir) {
+				if (LastMeeting[unit] > e[unit]) {sOut[unit] = 0;};
+
+				if (unit == "x") sOut.mouseOut.left = true;
+				if (unit == "y") sOut.mouseOut.top = true;
+
+				if (LastMeeting[unit] <= e[unit]) {
+					LastMeeting[unit] = 0;
+					if (LastMeeting[unit_] == 0) {
+						if (LastMeeting[unit_] == 0) LastMouseBorder.splice(LastMeeting.i,1);
+					}
+				}
+			}
+		}
+	}
+
+	// console.log(LastMeeting,LastMeeting.dir, e.x, e.y)
+	//Mouse is going right
+	if (speed.x > 0){
 	//Right collision
-	if ((tldp.x >= parCrd.w)) {
-		outSpeed.X = speed.x - (tldp.x - parCrd.w);
-		elCrd.moveXL = false;
-		report.right = true;
-	} 
+		if (tldp.x >= parCrd.w) {
+			sOut.x = sСalculation("x","w","+");	
+			sOut.colision.right = true;
+		}
+		trackLastMeeting("x","+");
+	}
+
+	//Mouse is going left
+	if (speed.x < 0) {
 	//Left collision
-	if (elCrd.x + speed.x <= 0) {
-		outSpeed.X = speed.x - (elCrd.x + speed.x);
-		elCrd.moveXR = false;
-		report.left = true;
+		if (elCrd.x + speed.x <= 0) {
+			sOut.x = sСalculation("x","w","-");
+			sOut.colision.left = true;
+		}
+
+		trackLastMeeting("x","-");
 	} 
 	
 	//Bottom collision
-	if (tldp.y >= parCrd.h) {
-		outSpeed.Y = speed.y - (tldp.y - parCrd.h);
-		elCrd.moveYB = false;
-		report.bottom = true;
+	if (speed.y > 0) {
+		if (tldp.y >= parCrd.h) {
+			sOut.y = sСalculation("y","h","+");
+			sOut.colision.bottom = true;
+		}
+
+		trackLastMeeting("y","+");
 	}
 	//Top collision
-	if (elCrd.y + speed.y < 0) {
-		outSpeed.Y = speed.y - (elCrd.y + speed.y);
-		elCrd.moveYT = false;
-		report.top = true;
-	}
-	
-	//speed entry 
-	
-	if (speed.x > 0 && elCrd.moveXL ) {
-		outSpeed.X += speed.x;
-	
-		if (e.x - elCrd.w / 2 <= parCrd.X) {
-			outSpeed.X = 0;
+	if (speed.y < 0) {
+		if (elCrd.y + speed.y < 0) {
+			sOut.y = sСalculation("y","h","-");
+			sOut.colision.top = true;
 		}
-	}
-	if (speed.x < 0 && elCrd.moveXR ) {
-		outSpeed.X += speed.x;
-	
-		if (e.x + elCrd.w / 2 >= parCrd.x_abs_bd()) {
-			outSpeed.X = 0;
-		}
+
+		trackLastMeeting("y","-");
 	}
 	
-	if (speed.y > 0 && elCrd.moveYB ) {
-		outSpeed.Y += speed.y;
-	
-		if (e.y - elCrd.h / 2 <= parCrd.Y) {
-			outSpeed.Y = 0;
-		}
-	}
-	if (speed.y < 0 && elCrd.moveYT ) {
-		outSpeed.Y += speed.y;
-	
-		if (e.y + elCrd.h / 2 >= parCrd.y_abs_bd()) {
-			outSpeed.Y = 0;
-		}
-	}
-	
-	return {
-		//here I return the speed relative to the parent
-		x:outSpeed.X,
-		y:outSpeed.Y,
-		report:report
-	}
+	//here I return the speed relative to the parent
+	return sOut;
 	
 	}
 	
 	//D_D it's the function for start Drag&drop DOM elements
 	
-	const D_D = function (main_el,par,fdfex,def_el,pos_x,pos_y) {
+const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 	//main_el is a trigger, elemet that start drag&drop
 	//par is for collision, so element can't go out of parent
+	//callback function
 	//with pos_x and pos_y you can set position for element
 	//with def_el you can move another element
-	//*fdfex is a function definition expression. And a function definition expression it is a function is passed as an argument to another function
 	
-	const el = main_el;
+	let el = main_el;
+	if (this instanceof Element & typeof this == "object") {
+
+	}
 	el.__proto__.isDraging = true;
 	el.__proto__.isResizing = false;
 	
@@ -460,11 +508,11 @@ const getElCrd = function (el,par) {
 	//here I set another position of element with css
 		elCrd.X = getCoords(el).left;
 		elCrd.Y = getCoords(el).top;
-		if (fdfex !== undefined && fdfex !== "" && fdfex !== 0) {
+		if (callback !== undefined && callback !== "" && callback !== 0) {
 			// 1 is moving
 			let status = 1;
-			if (typeof fdfex == "function") {
-				fdfex({'event':e,'el':el, 'status':status, 'position':{'x':elCrd.X,'y':elCrd.Y}});
+			if (typeof callback == "function") {
+				callback({'event':e,'el':el, 'status':status, 'position':{'x':elCrd.X,'y':elCrd.Y}});
 			}
 		}
 	
@@ -483,6 +531,7 @@ const getElCrd = function (el,par) {
 	//END OF MOVE DRAG AND DROP
 	
 	function mUpD_D (e) {
+		LastMouseBorder = [];
 		window.removeEventListener('mousemove',mMoveD_D);
 		window.removeEventListener('mouseup',mUpD_D);
 		if (par) {
@@ -492,11 +541,11 @@ const getElCrd = function (el,par) {
 	
 	//here I set another position of element with css
 	
-		if (fdfex !== undefined && fdfex !== "" && fdfex !== 0) {
+		if (callback !== undefined && callback !== "" && callback !== 0) {
 			// 0 is moving
 			let status = 0;
-			if (typeof fdfex == "function") {
-				fdfex({'event':e,'el':el, 'status':status, 'position':{'x':elCrd.X,'y':elCrd.Y}});
+			if (typeof callback == "function") {
+				callback({'event':e,'el':el, 'status':status, 'position':{'x':elCrd.X,'y':elCrd.Y}});
 			}
 		}
 	
@@ -512,31 +561,109 @@ const getElCrd = function (el,par) {
 	}
 	//END OF STOP DRAG AND DROP
 	
-	
-	
+
+
 	//RESIZE PART
 	//RESIZE START
 	const resizeEl = function (el,par,fdfex,minX,minY,maxX,maxY,notSquare) {
+	//*fdfex is a function definition expression. And a function definition expression it is a function is passed as an argument to another function
 	//RESIZE START
 	let isMouseOver = false;
 	
 	let Relements = [];
 	
 	
-	{
+
 	//CREATE RESIZER
-	let Rdirection = ["se","sw","nw", "ne"];
-	
-	for (let i=0;i<4;i++) {
-		if (document.querySelectorAll(".resizer").length < 4) {
+	let rDirBgColor = '#c9c9c9',
+	rDirW_H = ['10px','10px'];
+	let Rdirection = {
+		"north":{
+			width: rDirW_H[0],
+			height: rDirW_H[1],
+			top: '-1px',
+			width: '100%',
+			cursor: 'n-resize',
+			background: rDirBgColor
+		},
+		"west":{
+			width: rDirW_H[0],
+			height: rDirW_H[1],
+			left: '-1px',
+			height: '100%',
+			cursor: 'w-resize',
+			// background: '#545454'
+			background: rDirBgColor
+		},
+		"south":{
+			width: rDirW_H[0],
+			height: rDirW_H[1],
+			bottom: '-1px',
+			width: '100%',
+			cursor: 's-resize',
+			// background: '#262525'
+			background: rDirBgColor
+		},
+		"east":{
+			width: rDirW_H[0],
+			height: rDirW_H[1],
+			right: '-1px',
+			height: '100%',
+			cursor: 'e-resize',
+			// background: '#8c8a8a'
+			background: rDirBgColor
+		},
+		"nw":{
+			top: '-1px',
+			left: '-1px',
+			cursor: 'nw-resize',
+			// background: '#b7b7b7'
+			background: rDirBgColor
+		},
+		"ne":{
+			top: '-1px',
+			right: '-1px',
+			cursor: 'ne-resize',
+			// background: '#6d6c6c',
+			background: rDirBgColor
+		},
+		"sw":{
+			bottom: '-1px',
+			left: '-1px',
+			cursor: 'sw-resize',
+			// background: '#3d3c3c'
+			background: rDirBgColor
+		},
+		"se":{
+			bottom: '-1px',
+			right: '-1px',
+			cursor: 'se-resize',
+			// background: '#000000'
+			background: rDirBgColor
+		}
+	};
+	let rDirArr = Object.entries(Rdirection);
+
+	if (el.querySelectorAll(".AsaResizer").length < 8) {
+		for (let i=0;i<8;i++) {
 			Relements[i] = document.createElement("div");
-			Relements[i].classList.add("resizer");
-			Relements[i].classList.add(Rdirection[i]);
+			let Rel = getEl(Relements[i]);
+			Rel.setCSS({
+				position: 'absolute',
+				width: '8px',
+				height: '8px',
+				borderRight: '5px',
+				zIndex: '101'
+			});
+			Rel.setCSS(rDirArr[i][1]);
+
+			Relements[i].classList.add("AsaResizer");
+			Relements[i].classList.add(rDirArr[i][0]);
 			el.append(Relements[i])
 		}
 	}
 	
-	}//END CREATE RESIZER
+//END CREATE RESIZER
 	
 	el.addEventListener("mouseover",mover_R);
 	el.addEventListener("mouseout",mout_R);
@@ -549,15 +676,17 @@ const getElCrd = function (el,par) {
 		isMouseOver = false;
 	}
 	
-	
-	const resizers = el.querySelectorAll(".resizer");
+	let resizers = el.querySelectorAll(".AsaResizer");
 	let currentResizer;
 	
 	//resizer diraction
 	let rzr_dirct = {}
-	
+	//This option is optimized version :)
+	el.addEventListener("mousedown", mDown_Rz);
+
 	for (let resizer of resizers) {
-	resizer.addEventListener("mousedown", mDown_Rz);
+	//Old option is not optimized version
+	// resizer.addEventListener("mousedown", mDown_Rz);
 	let t_rzr = resizer.classList[1];
 	//layout ["+","+",0,0] means which value to remove and where to add (width and height)
 	//["right","bottom","left","top"]
@@ -574,8 +703,14 @@ const getElCrd = function (el,par) {
 	}
 	
 	function mDown_Rz (e) {
-		el.isResizing = true;
 		currentResizer = e.target;
+
+		//If I don't have the class name in the Rdirection object, I'll finish the function
+		if(!rDirArr.some(i=>{return currentResizer.classList[1] == i[0];})) return 0;
+		
+		el.isResizing = true;
+		
+		
 		window.addEventListener("mousemove", mMove_Rz);
 		window.addEventListener("mouseup", mUp_Rz);
 	
@@ -623,10 +758,10 @@ const getElCrd = function (el,par) {
 					//MAX
 					if ((elCrd.w+s.w >= maxX && s.w > 0) & maxX != 0) {
 						s.w = s.w - (elCrd.w+s.w - maxX);
+						s.colision.right = true;
 						s.x = 0;
 						s.y = 0;
 						s.h = 0;
-						s.colision.right = true;
 					}
 				}
 				if (op_h == "+") {
@@ -754,7 +889,7 @@ const getElCrd = function (el,par) {
 	
 				return s;
 			}
-			for (let key in rzr_dirct) {
+			for (let key in rzr_dirct) { 
 				//here the script looks for names like "sw","se"...
 				if (currentResizer.classList.contains(key)) {
 					//ictn = instruction;
@@ -777,49 +912,44 @@ const getElCrd = function (el,par) {
 			y:new_speed.y
 		}
 	if (par instanceof Element) {
-		new_par_speedSize = internalColision (currentResizer,par,e,new_speed.w,new_speed.h);
-		new_par_speedCrd = internalColision (currentResizer,par,e,new_speed.x,new_speed.y);
-	
-		if (new_par_speedCrd.report.top) {
-			new_par_speedSize.y = 0;
-		}
-		if (new_par_speedCrd.report.left) {
-			new_par_speedSize.x = 0;
-		}
+		if (elCrd.w == par.clientWidth) {elCrd.w-= 10};
+		if (elCrd.h == par.clientWidth) {elCrd.h-= 10};
+		//PARENT COLISION
+		new_par_speed ={x:inpSpeed.x, y:inpSpeed.y};
+		new_par_speedS = internalColision (el,par,e,new_speed.w,new_speed.h);
+		new_par_speed = internalColision (el,par,e,new_speed.x,new_speed.y);
+
 		if (notSquare === undefined || notSquare == 0 || notSquare == "") {
-			if (new_par_speedCrd.report.right) {
-				new_par_speedSize.y = 0;
-				new_par_speedCrd.y = 0;
+			if (new_par_speed.colision.top || new_par_speed.mouseOut.top) {
+				new_par_speed.x = new_par_speed.y;
+				new_par_speedS.x = 0;
 			}
-			if (new_par_speedCrd.report.bottom) {
-				new_par_speedSize.x = 0;
-				new_par_speedCrd.x = 0;
+			if (new_par_speedS.colision.left || new_par_speedS.mouseOut.left) {
+				new_par_speed.y = new_par_speed.x;
+				new_par_speedS.y = 0;
+			}
+
+			if (new_par_speedS.colision.right || new_par_speedS.mouseOut.right) {
+				new_par_speedS.y = new_par_speedS.x;
+				new_par_speed.y = 0;
+			}
+			if (new_par_speedS.colision.bottom || new_par_speedS.mouseOut.bottom) {
+				new_par_speedS.x = new_par_speedS.y;
+				new_par_speed.x = 0;
 			}
 		}
-		
-	
-		inpSpeed.w = new_par_speedSize.x;
-		inpSpeed.h = new_par_speedSize.y;
-		inpSpeed.x = new_par_speedCrd.x;
-		inpSpeed.y = new_par_speedCrd.y;	
+		inpSpeed.x = new_par_speed.x;
+		inpSpeed.y = new_par_speed.y;	
+		inpSpeed.w = new_par_speedS.x;
+		inpSpeed.h = new_par_speedS.y;
 		
 	}
+	
 		elCrd.w += inpSpeed.w;
 		elCrd.h += inpSpeed.h;
 		elCrd.x += inpSpeed.x;
-		elCrd.y += inpSpeed.y;	
-	
-	
-	// }
-	
+		elCrd.y += inpSpeed.y;
 		
-		// let inpW = speed.x + elCrd.w;
-		// let inpH = speed.y + elCrd.h;
-	
-		// elCrd.w += speed.x;
-		// elCrd.h += speed.y;
-		// elCrd.x_par += speed.x;
-		// elCrd.y_par += speed.y;	
 		
 		el.style.width = elCrd.w + "px";
 		el.style.height = elCrd.h + "px";
