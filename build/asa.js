@@ -1,5 +1,5 @@
 /*
-AsaJS v.0.4.1
+AsaJS v.0.4.5
 
 (c) 2021 by RemXYZ. All rights reserved.
 This source code is licensed under the MIT license found in the
@@ -9,13 +9,24 @@ https://github.com/RemXYZ/AsaJS
 */
 
 //SETTINGs
-const asa_setting = {
-	D_D:{stop_before_the_border:false}
+const asa_settings = {
+	D_D:{stop_before_the_border:false},
+	getEl:{
+		newProto:{}
+	}
+}
+
+//Added 28.08.21
+const setProtoTo = function (newFun,where) {
+	const listWhere = ["getEl"];
+	const dest = listWhere.filter((e)=>{return where.name == e || where == e})[0];
+	if (!dest) return console.error(`You can set prototype only to functions '${listWhere}'`);
+	asa_settings.getEl.newProto[newFun.name] = newFun;
 }
 
 function asaTest(hello) {
 	console.log("Hello");
-	console.log(hello)
+	console.log("argument: ",hello)
 }
 	
 //GET ELEMENT 
@@ -35,11 +46,18 @@ let getEl = function (mix) {
 				
 			let resultF = result[i];
 			resultF.__proto__.CSSinfo = CSSinfo;
-			resultF.__proto__.setCSS = setCSS;
-			resultF.__proto__.find_top_node = find_top_node;
+			resultF.__proto__.css = css;
 			resultF.__proto__.replaceAt = replaceAt;
-			resultF.__proto__.getElCrd = getElCrd;
+			resultF.__proto__.getCrd = getElCrd;
 			resultF.__proto__.html = html;
+			resultF.__proto__.into = into;
+			resultF.__proto__.crEl = crEl;
+
+			for (const [key,v] of Object.entries(asa_settings.getEl.newProto)) {
+				resultF.__proto__[key] = v;
+			}
+				
+			
 		}
 
 		if (result.length == 1) {
@@ -58,7 +76,8 @@ return window.getComputedStyle(this,null);
 // Object.prototype.CSSinfo = CSSinfo;
 
 //SET CSS STYLE
-const setCSS = function (mix,arg2) {
+//28.08.21 I CHANGED setCSS on css
+const css = function (mix,arg2) {
 	if (typeof mix == "object") {
 		for (const [key, value] of Object.entries(mix)) {
 			this.style[key] = value;
@@ -70,32 +89,77 @@ const setCSS = function (mix,arg2) {
 // Object.prototype.setCSS = setCSS;
 
 //Find top element
-const find_top_node = function (mix) {
-let el_par = this,
-stop = true;
-while(stop) {
-	el_par = el_par.parentNode;
-	if (!el_par.classList.contains(mix) || el_par.id != mix) {
-		let el_chd = el_par.children;
-		for (let chld of el_chd) {
-			if (chld.classList.contains(mix) || chld.id == mix) {
-				return chld;
-				stop = false;
+//analogue .closest I didn't know that :D
+//ELETED 31.08.2021 v0.4.5
+// const find_top_node = function (mix) {
+// let el_par = this,
+// stop = true;
+// while(stop) {
+// 	el_par = el_par.parentNode;
+// 	if (!el_par.classList.contains(mix) || el_par.id != mix) {
+// 		let el_chd = el_par.children;
+// 		for (let chld of el_chd) {
+// 			if (chld.classList.contains(mix) || chld.id == mix) {
+// 				return chld;
+// 				stop = false;
+// 			}
+// 		}
+// 	}else {
+// 		return el_par;
+// 		break;
+// 	}
+// 	if (el_par == document.body) {
+// 		stop = false;
+// 	}
+// }
+// }
+
+//MODIFIED 29.08.21
+//CREATE(MAKE) A ELEMENT
+function crEl (tag,att,callback) {
+	//att mast be a object
+	//expample {"class":"input","type":"number"}
+	let node = document.createElement(tag);
+	if (typeof att == 'object') {
+		for(var key in att) {
+			if (att.hasOwnProperty(key)){
+				node.setAttribute(key,att[key]);
 			}
 		}
-	}else {
-		return el_par;
-		break;
 	}
-	if (el_par == document.body) {
-		stop = false;
+	if (typeof att == "string") {
+		const isClass = new RegExp ("^\\.","i");
+		if(isClass.test(att)){
+			let text = replaceAt(att,0); 
+			let splited = text.split(" ");
+			splited.map((e)=>node.classList.add(e));	
+		}
+
+		const isId = new RegExp ("^\\#");
+		if(isId.test(att)) {
+			let text = replaceAt(att,0); 
+			node.id = text;
+		}
 	}
+
+	node = getEl(node);
+
+	if (callback !== undefined && callback != "" && callback != false) {
+		callback(node);
+	}
+	if (this instanceof Element & typeof this == "object") {
+		this.append(node);
+	}
+
+	return node;
 }
-}
-// Object.prototype.find_top_node = find_top_node;
 
 //replace sign with index
+//You can use it with getEl or by it self
 const replaceAt = function(txt, i, repl) {
+	//i is the index where you want replace the text;
+	//repl is the symbol which you wish replace to
+
 	if (this instanceof Element & typeof this == "object") {
 		const el = this;
 		if (i !== undefined && i !== "" && i !== 0) {
@@ -116,14 +180,38 @@ const replaceAt = function(txt, i, repl) {
 	return String(txt).substr(0, i) + repl + String(txt).substr(i + repl.length);
 }
 
-//Added 26.08.21
+//Added 26.08.21 v0.4.3
 //Changing the default innerHTML method
 const html = function (txt) {
 	if (txt === undefined) {
 		return this.innerHTML;
 	}
 	this.innerHTML = txt;
+	return this;
 }
+
+//Added 26.08.21 v0.4.4
+const into = function (obj,prepend) {
+	if (obj instanceof Element & typeof obj == "object") {
+		if (prepend == true) {
+			obj.prepend(this);
+		}else {
+			obj.append(this);
+		}
+	}else {
+		console.error(`${obj} is not DOM element`)
+	}
+
+	return this;
+
+}
+
+//Added 26.08.21 v0.4.5
+
+const num = function () {
+	return Number(this);
+}
+String.prototype.num = num;
 
 /////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////FREE PART/////////////////////////////////////////
@@ -145,22 +233,6 @@ function isEmptyObject(obj) {
 	return true;
 }
 //sourceEnd
-
-//CREATE(MAKE) A ELEMENT
-function crEl (tag,att) {
-	//att mast be a object
-	//expample {"class":"input","type":"number"}
-	let node = document.createElement(tag);
-	if (typeof att == 'object') {
-		for(var key in att) {
-			if (att.hasOwnProperty(key)){
-				node.setAttribute(key,att[key]);
-			}
-		}
-	}
-	node = getEl(node);
-	return node;
-}
 
 //sourse https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandom(min, max) {
@@ -254,6 +326,7 @@ const getElCrd = function (el,par) {
 	if (par === undefined) {
 		par = document.body;
 	}
+	//CHANGED 28.08.2021 last_save v0.4.2
 	var el = {
 		X:getCoords(el).left,
 		Y:getCoords(el).top,
@@ -261,12 +334,14 @@ const getElCrd = function (el,par) {
 		y:el.offsetTop,
 		x_abs:getCoords(el).left - getCoords(par).left - (par.offsetWidth - par.clientWidth)/2,
 		y_abs:getCoords(el).top - getCoords(par).top - (par.offsetWidth - par.clientWidth)/2,
-		w:el.clientWidth,
-		h:el.clientHeight,
-		'x_bd':function(){return this.x+this.w},
-		'y_bd':function(){return this.y+this.h},
-		'x_abs_bd':function(){return this.X+this.w},
-		'y_abs_bd':function(){return this.Y+this.h}
+		w:el.offsetWidth,
+		h:el.offsetHeight,
+		cw:el.clientWidth,
+		ch:el.clientHeight,
+		'x_bd':el.offsetLeft + el.clientWidth,
+		'y_bd':el.offsetTop + el.clientHeight,
+		'x_abs_bd':getCoords(el).left + el.clientWidth,
+		'y_abs_bd':getCoords(el).top + el.clientHeight
 	}
 	return el;
 }
@@ -478,7 +553,7 @@ const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 	
 	let parentOut = false;
 	
-	if (par && asa_setting.D_D.stop_before_the_border == true) {
+	if (par && asa_settings.D_D.stop_before_the_border == true) {
 		//If mouse is out of parent territory, the element will not move
 		par.addEventListener("mouseout",par_out);
 		function par_out () {
@@ -502,16 +577,16 @@ const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 		}
 	
 		let mouse = {
-			x:e.x,
-			y:e.y
+			x:e.x + window.pageXOffset,
+			y:e.y + window.pageYOffset
 		}
 	
 	function mMoveD_D (e) {
 	
 	if (!el.isResizing){
 	
-	mouse.x = e.x - mouse.x;
-	mouse.y = e.y - mouse.y;
+	mouse.x = e.x + window.pageXOffset - mouse.x;
+	mouse.y = e.y + window.pageYOffset - mouse.y;
 	
 	if (par) {
 	//this if is for collision with parent
@@ -543,8 +618,8 @@ const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 			el.style.left = elCrd.x + "px";
 			el.style.top = elCrd.y + "px";
 			//this function makes a loop
-			mouse.x = e.x;
-			mouse.y = e.y;
+			mouse.x = e.x+window.pageXOffset;
+			mouse.y = e.y+window.pageYOffset;
 		}
 	}
 	
@@ -670,14 +745,14 @@ const D_D = function (main_el,par,callback,def_el,pos_x,pos_y) {
 		for (let i=0;i<8;i++) {
 			Relements[i] = document.createElement("div");
 			let Rel = getEl(Relements[i]);
-			Rel.setCSS({
+			Rel.css({
 				position: 'absolute',
 				width: '8px',
 				height: '8px',
 				borderRight: '5px',
 				zIndex: '101'
 			});
-			Rel.setCSS(rDirArr[i][1]);
+			Rel.css(rDirArr[i][1]);
 
 			Relements[i].classList.add("AsaResizer");
 			Relements[i].classList.add(rDirArr[i][0]);
