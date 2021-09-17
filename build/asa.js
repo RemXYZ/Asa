@@ -1,5 +1,5 @@
 /*
-AsaJS v.0.4.6
+AsaJS v.0.4.7
 
 (c) 2021 by RemXYZ. All rights reserved.
 This source code is licensed under the MIT license found in the
@@ -183,6 +183,16 @@ const replaceAt = function(txt, i, repl) {
 //Added 26.08.21 v0.4.3
 //Changing the default innerHTML method
 const html = function (txt) {
+	if (this.tagName == "INPUT"
+	||this.tagName == "TEXTAREA"
+	){
+		if (txt === undefined) {
+			return this.value;
+		}
+		this.value = txt;
+		return this;
+	}
+
 	if (txt === undefined) {
 		return this.innerHTML;
 	}
@@ -221,7 +231,6 @@ const ajax = function (option,callback) {
 	}
 	if (!option.method) option.method = defaultVal.method;
 	if (!option.url) return console.error("url: "+option.url+" is incorrect");
-	//MUST BE CHANGED
 	if (typeof option.data === "string") {option.data = "post="+option.data; }
 	if (typeof option.data === "object" && option.dataType == "text") {
 		let postFrom = [];	
@@ -252,7 +261,7 @@ const ajax = function (option,callback) {
 	
 	if (!option.dataType || init.headers === undefined) delete init.headers;
 	if (option.method == "GET") delete init.body;
-	
+
 	return fetch (option.url,init)
 	.then( (response) => {
 		if (response.status !== 200) {           
@@ -297,7 +306,35 @@ function getRandomInt(min, max, round) {
 	}
 //sourceEnd
 
+//Added 17.09.21
+//Generate a simple key
+function genSimpleKey (quantity) {
+	let qn = 32,
+	new_key = "";
+	if (quantity) {
+		qn = quantity;
+	}
+    for (let i=1;i<qn;i++) {
+        let kit = {
+            "10":"A",
+            "11":"B",
+            "12":"C",
+            "13":"D",
+            "14":"E",
+            "15":"F"
+        }
+        let rint = getRandomInt(0,15);
+        if (kit[rint]) {
+            rint = kit[rint];
+            
+        }
+        new_key += rint;
+    }
+    return new_key;
+}
+///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////TIME PART///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 
 //if less then 10
 function if_lt_10 (unit) {
