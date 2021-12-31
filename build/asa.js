@@ -1,5 +1,5 @@
 /*
-AsaJS v.0.4.7
+AsaJS v.0.4.8
 
 (c) 2021 by RemXYZ. All rights reserved.
 This source code is licensed under the MIT license found in the
@@ -50,6 +50,7 @@ let getEl = function (mix) {
 			resultF.__proto__.replaceAt = replaceAt;
 			resultF.__proto__.getCrd = getElCrd;
 			resultF.__proto__.html = html;
+			resultF.__proto__.ahtml = ahtml;
 			resultF.__proto__.into = into;
 			resultF.__proto__.crEl = crEl;
 
@@ -180,9 +181,24 @@ const replaceAt = function(txt, i, repl) {
 	return String(txt).substr(0, i) + repl + String(txt).substr(i + repl.length);
 }
 
+
+
+//Added 12.11.2021
+//Insert into the text a new text
+const insertInto = function (txt, i, newText){
+	if (i == 0) {
+		return newText+txt;
+	}
+	if (i >= txt.length) {
+		return txt+newText;
+	}
+	return String(txt).substr(0, i) + newText + String(txt).substr(i ,txt.length);
+}
+
+
 //Added 26.08.21 v0.4.3
 //Changing the default innerHTML method
-const html = function (txt) {
+const html = function (txt,el) {
 	if (this.tagName == "INPUT"
 	||this.tagName == "TEXTAREA"
 	){
@@ -198,6 +214,10 @@ const html = function (txt) {
 	}
 	this.innerHTML = txt;
 	return this;
+}
+//Added 27.09.21
+const ahtml = function (txt) {
+	return this.html(this.html() + txt);
 }
 
 //Added 26.08.21 v0.4.4
@@ -221,6 +241,14 @@ const into = function (obj,prepend) {
 //MORE: https://good-code.ru/ajax-zapros/
 //MORE: https://learn.javascript.ru/fetch#zagolovki-otveta
 //ajax v - 1.0 (only text and json)
+/*
+ajax({
+	url:"",
+	data:{hi:"hello"}
+}).then(resp=>{
+	...
+})
+*/
 const ajax = function (option,callback) {
 	const defaultVal = {
 		method:"POST",
@@ -231,7 +259,10 @@ const ajax = function (option,callback) {
 	}
 	if (!option.method) option.method = defaultVal.method;
 	if (!option.url) return console.error("url: "+option.url+" is incorrect");
-	if (typeof option.data === "string") {option.data = "post="+option.data; }
+	//Modified 20.09.21---
+	// if (typeof option.data === "string") {option.data = "post="+option.data; }
+	if (!option.dataType) option.dataType = "text";
+	//---
 	if (typeof option.data === "object" && option.dataType == "text") {
 		let postFrom = [];	
 		for (let [k,v] of Object.entries(option.data)) {
@@ -268,7 +299,7 @@ const ajax = function (option,callback) {
 			return Promise.reject();
 		}
 		if(callback) callback(response);
-		return response[option.dataType]()
+		return response[option.dataType]();
 	});
 }
 
@@ -279,7 +310,7 @@ const ajax = function (option,callback) {
 function stopEvent (e) {
 	//*cross-browser stop
 	e.stopPropagation ? e.stopPropagation() : (e.cancelBubble=true);
-	// e.preventDefault();
+	e.preventDefault();
 }
 
 //Source https://ru.stackoverflow.com/questions/454972/%D0%9A%D0%B0%D0%BA-%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%B8%D1%82%D1%8C-%D1%87%D1%82%D0%BE-%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82-%D0%BD%D0%B5-%D0%BF%D1%83%D1%81%D1%82%D0%BE%D0%B9
@@ -346,11 +377,11 @@ function if_lt_10 (unit) {
 	
 const get_my_time = function (lg) {
 
-	let week_names = {
-		ru:["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
-		en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-		ang:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-	}
+	// let week_names = {
+	// 	ru:["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
+	// 	en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+	// 	ang:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+	// }
 
 	//yr = year, s_yr = short year, mo = month, wk = weak, d = day, h = hour, min = minute, s = secund
 	const date = {};
@@ -365,6 +396,7 @@ const get_my_time = function (lg) {
 	date.h = NewDate.getHours();
 	date.min = NewDate.getMinutes();
 	date.s = NewDate.getSeconds();
+	date.unix = +NewDate;
 
 	if (lg !== undefined) {
 		if (week_names[lg] !== undefined) {
