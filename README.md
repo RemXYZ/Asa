@@ -36,6 +36,9 @@ getEl("#abcId") // <div id="abcId">Hi</div>
 getEl("div") // NodeList(2) [div.abcClass, div#abcId]
 ```
 
+<br>
+<br>
+
 CSSinfo()
 ---
 
