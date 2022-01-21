@@ -25,7 +25,7 @@ Once you use this command, new asaJS methods will be added to all these elements
 
 ---
 
-**exemple**
+**example**
 ```html
 <div class="abcClass">Hello</div>
 <div id="abcId">Hi</div>
@@ -49,7 +49,7 @@ element.CSSinfo()
 ```
 Shows elements css information
 
-**exemple**
+**example**
 ```javascript
 
 const abc = getEl(".abcClass");
@@ -67,7 +67,7 @@ css() method
 Sets the css style. <br>
 With no arguments show css information.
 
-**exemple**
+**example**
 ```js
 //1.
 element.css(property,value);
@@ -80,4 +80,32 @@ element.css({
 //3.
 element.css() // show css info
 ```
+
+<br>
+<br>
+
+crEl() function
+---
+
+```javascript
+crEl(selector, object, callback)
+```
+
+*```selector``` - HTML selector(string)
+*```object``` - attribute: {attribute:value}
+*```callback``` - (function)
+
+Create element, sets attribute, and do callback with first argument as new element
+
+**example**
+```javascript
+
+const myDiv = crEl("div", {class:"newDiv"} (el)=> {
+    console.log(el) // div.newDiv
+})
+
+console.log(myDiv) // div.newDiv
+
+```
+
 
