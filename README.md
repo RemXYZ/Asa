@@ -10,7 +10,7 @@
 <br>
 <br>
 
-getEl
+getEl() function
 ---
 
 ```javascript
@@ -39,7 +39,7 @@ getEl("div") // NodeList(2) [div.abcClass, div#abcId]
 <br>
 <br>
 
-CSSinfo()
+CSSinfo() method
 ---
 
 ```js
@@ -61,7 +61,7 @@ abc.CSSinfo().display    //block
 <br>
 <br>
 
-css
+css() method
 ---
 
 ```js
@@ -73,5 +73,10 @@ element.css({
     property:value,
     ...
 })
+//3.
+element.css() // show css info
 ```
+
+sets the css style. --
+With no arguments show css information,
 
