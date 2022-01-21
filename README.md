@@ -5,10 +5,10 @@
 
 
 
-Documentation mini
+###Documentation mini
 
 ```javascript
 getEl()
 ``` 
->to select element from DOM
+to select element from DOM
 
