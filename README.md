@@ -58,3 +58,20 @@ abc.CSSinfo().display    //block
 
 ```
 
+<br>
+<br>
+
+css
+---
+
+```js
+//1.
+element.css(property,value);
+//2.
+element.css({
+    property:value,
+    property:value,
+    ...
+})
+```
+
