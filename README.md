@@ -27,6 +27,7 @@ Once you use this command, new methods will be added to all these elements!
 ```javascript
 getEl("#abcId") // <div id="abcId">Hi</div>
 getEl(".abcClass") // <div class="abcClass">Hello</div>
+getEl("div") // NodeList(2) [div.abcClass, div#abcId]
 ```
  
 
