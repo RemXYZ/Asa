@@ -5,7 +5,9 @@
 
 
 
-### Documentation mini
+## Documentation mini
+
+##getEl
 
 ```javascript
 getEl(selectors)
@@ -30,6 +32,8 @@ getEl("#abcId") // <div id="abcId">Hi</div>
 getEl("div") // NodeList(2) [div.abcClass, div#abcId]
 ```
 
+
+###CSSinfo()
 
 ```js
 
