@@ -1,6 +1,6 @@
 # Asa
     Java Script Library
-    Version: 0.4.8
+    Version: 0.4.7
 
 
 
