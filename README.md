@@ -91,9 +91,9 @@ crEl() function
 crEl(selector, object, callback)
 ```
 
-*```selector``` - HTML selector(string)
-*```object``` - attribute: {attribute:value}
-*```callback``` - (function)
+-```selector``` - HTML selector(string)
+-```object``` - attribute: {attribute:value}
+-```callback``` - (function)
 
 Create element, sets attribute, and do callback with first argument as new element
 
