@@ -11,6 +11,8 @@
 getEl(selectors)
 ``` 
 Returns element or elements (if there are many).
+
+---
 **NOTE**
 
 Once you use this command, new methods will be added to all these elements!
