@@ -10,8 +10,12 @@
 ```javascript
 getEl(selectors)
 ``` 
-returns element or elements (if they are more)
+Returns element or elements (if there are many)
 
 **exemple**
+```html
+<div class="abcClass">Hello</div>
+<div id="abcId">Hi</div>
+```
  
 
