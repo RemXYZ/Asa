@@ -1,6 +1,8 @@
 # Asa
     Java Script Library
     Version: 0.4.8
+    Experemental version !
+    Methods are added to the prototype of the object, so the     library may not be stable in the future
 
 
 
@@ -84,18 +86,27 @@ element.css() // show css info
 <br>
 <br>
 
-crEl() function
+
+crEl() function / method
 ---
 
+
+
 ```javascript
-crEl(selector, attribute, callback)
+crEl(selector, attribute, callback);
+element.crEl(selector, attribute, callback)
 ```
+
+
+
 
 - ```selector``` - HTML selector(string)
 - ```attribute``` - {attribute:value, ...} or set class or id(value)
 - ```callback``` - (function)
 
 Create element, sets attribute, and executes a callback with the first argument, which is just the newly created element.
+<br>
+It can also be used as a method to add a new element to an already created element.
 
 ---
 **NOTE**
@@ -120,6 +131,13 @@ console.log(myDiv2) // div.abcClass
 //3.
 const myDiv3 = crEl("div", "#abcId")
 console.log(myDiv3) // div#abcId
+
+//4.
+const abcEl = getEl(".abc");
+abcEl.crEl("div", ".abcClass");
+
+console.log(abcEl.children)    //HTMLCollection [div.abcClass]
+
 
 ```
 
