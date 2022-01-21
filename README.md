@@ -15,7 +15,7 @@ Returns element or elements (if there are many).
 ---
 **NOTE**
 
-Once you use this command, new methods will be added to all these elements!
+Once you use this command, new asaJS methods will be added to all these elements!
 
 ---
 
@@ -25,9 +25,25 @@ Once you use this command, new methods will be added to all these elements!
 <div id="abcId">Hi</div>
 ```
 ```javascript
-getEl("#abcId") // <div id="abcId">Hi</div>
 getEl(".abcClass") // <div class="abcClass">Hello</div>
+getEl("#abcId") // <div id="abcId">Hi</div>
 getEl("div") // NodeList(2) [div.abcClass, div#abcId]
 ```
- 
+
+
+```js
+
+element.CSSinfo()
+
+```
+Shows elements css information
+
+**exemple**
+```javascript
+
+const abc = getEl(".abcClass");
+
+abc.CSSinfo().display    //block
+
+```
 
