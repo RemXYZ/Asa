@@ -95,7 +95,15 @@ crEl(selector, attribute, callback)
 - ```attribute``` - {attribute:value, ...} or set class or id(value)
 - ```callback``` - (function)
 
-Create element, sets attribute, and executes a callback with the first argument, which is just the newly created element
+Create element, sets attribute, and executes a callback with the first argument, which is just the newly created element.
+
+---
+**NOTE**
+
+Once you use this command, new asaJS methods will be added to all these elements!
+
+---
+
 
 **example**
 ```javascript
@@ -103,18 +111,15 @@ Create element, sets attribute, and executes a callback with the first argument,
 const myDiv = crEl("div", {class:"newDiv"} (el)=> {
     console.log(el) // div.newDiv
 })
-
 console.log(myDiv) // div.newDiv
 
 //2.
 const myDiv2 = crEl("div", ".abcClass")
-
-console.log(myDiv) // div.abcClass
+console.log(myDiv2) // div.abcClass
 
 //3.
-const myDiv2 = crEl("div", "#abcId")
-
-console.log(myDiv) // div#abcId
+const myDiv3 = crEl("div", "#abcId")
+console.log(myDiv3) // div#abcId
 
 ```
 
