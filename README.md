@@ -8,7 +8,9 @@
 ### Documentation mini
 
 ```javascript
-getEl()
+getEl(selectors)
 ``` 
-to select element from DOM
+returns element or elements (if they are more)
+**exemple**
+ 
 
