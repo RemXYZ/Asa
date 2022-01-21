@@ -11,7 +11,12 @@
 getEl(selectors)
 ``` 
 Returns element or elements (if there are many).
->Once you use this command, new methods will be added to all these elements!
+---
+**NOTE**
+
+Once you use this command, new methods will be added to all these elements!
+
+---
 
 **exemple**
 ```html
