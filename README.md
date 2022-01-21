@@ -11,6 +11,7 @@
 getEl(selectors)
 ``` 
 returns element or elements (if they are more)
+
 **exemple**
  
 
