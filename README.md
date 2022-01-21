@@ -7,7 +7,7 @@
 
 Documentation mini
 
-```
+```javascript
 getEl()
 ``` 
 >to select element from DOM
