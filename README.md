@@ -1,8 +1,8 @@
 # Asa
     Java Script Library
     Version: 0.4.8
-    Experemental version !
-    Methods are added to the prototype of the object, so the library may not be stable in the future
+    Experimental version !
+    Methods are added to the prototype of the element, so the library may not be stable in the future
 
 
 
