@@ -7,5 +7,8 @@
 
 Documentation mini
 
-**getEl() - 
-to select element from DOM
+```
+getEl()
+``` 
+>to select element from DOM
+
