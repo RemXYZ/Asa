@@ -77,6 +77,6 @@ element.css({
 element.css() // show css info
 ```
 
-sets the css style. --
+sets the css style. <br>
 With no arguments show css information,
 
