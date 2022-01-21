@@ -1,10 +1,10 @@
-#AsaJS
-Java Script Library
-Version: 0.4.8
-Experimental version !
-The library was made for the purpose of studying the work of
-javascript, and its work is similar to the [jQuery](https://jquery.com/) library.
-Methods are added to the prototype of the element, so the library may not be stable in the future.
+# AsaJS
+
+**Java Script Library** <br>
+**Version: 0.4.8** <br>
+**Experimental version !** <br>
+The library was made for the purpose of studying the work of javascript, and its work is similar to the [jQuery](https://jquery.com/) library. <br>
+Methods are added to the prototype of the element, so the library may not be stable in the future.<br>
 
 
 
