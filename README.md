@@ -88,23 +88,33 @@ crEl() function
 ---
 
 ```javascript
-crEl(selector, object, callback)
+crEl(selector, attribute, callback)
 ```
 
 - ```selector``` - HTML selector(string)
-- ```object``` - attribute: {attribute:value}
+- ```attribute``` - {attribute:value, ...} or set class or id(value)
 - ```callback``` - (function)
 
-Create element, sets attribute, and do callback with first argument as new element
+Create element, sets attribute, and executes a callback with the first argument, which is just the newly created element
 
 **example**
 ```javascript
-
+//1.
 const myDiv = crEl("div", {class:"newDiv"} (el)=> {
     console.log(el) // div.newDiv
 })
 
 console.log(myDiv) // div.newDiv
+
+//2.
+const myDiv2 = crEl("div", ".abcClass")
+
+console.log(myDiv) // div.abcClass
+
+//3.
+const myDiv2 = crEl("div", "#abcId")
+
+console.log(myDiv) // div#abcId
 
 ```
 
