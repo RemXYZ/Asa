@@ -64,6 +64,10 @@ abc.CSSinfo().display    //block
 css() method
 ---
 
+Sets the css style. <br>
+With no arguments show css information.
+
+**exemple**
 ```js
 //1.
 element.css(property,value);
@@ -76,7 +80,4 @@ element.css({
 //3.
 element.css() // show css info
 ```
-
-sets the css style. <br>
-With no arguments show css information,
 
