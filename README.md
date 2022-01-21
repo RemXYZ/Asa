@@ -1,4 +1,11 @@
 # Asa
     Java Script Library
-    Version: 0.4.7
-    Presently no documentation
+    Version: 0.4.8
+
+
+
+
+Documentation mini
+
+#getEl() - 
+to select element from DOM
